@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace Omnipay\TelcellWallet;
 
 use Omnipay\Common\AbstractGateway;
+use Omnipay\Common\Message\AbstractRequest;
 use Omnipay\Common\Message\NotificationInterface;
 use Omnipay\Common\Message\RequestInterface;
+use Omnipay\TelcellWallet\Message\CompletePurchaseRequest;
+use Omnipay\TelcellWallet\Message\PurchaseRequest;
 
 /**
  * @method NotificationInterface acceptNotification(array $options = array())
  * @method RequestInterface authorize(array $options = array())
  * @method RequestInterface completeAuthorize(array $options = array())
  * @method RequestInterface capture(array $options = array())
- * @method RequestInterface purchase(array $options = array())
- * @method RequestInterface completePurchase(array $options = array())
  * @method RequestInterface refund(array $options = array())
  * @method RequestInterface fetchTransaction(array $options = [])
  * @method RequestInterface void(array $options = array())
@@ -84,5 +85,25 @@ class TelcellWalletGateway extends AbstractGateway
     public function setShopKey(?string $shopKey): TelcellWalletGateway
     {
         return $this->setParameter('shopKey', $shopKey);
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return \Omnipay\TelcellWallet\Message\PurchaseRequest
+     */
+    public function purchase(array $options = array()): AbstractRequest
+    {
+        return $this->createRequest(PurchaseRequest::class, $options);
+    }
+
+    /**
+     * @param array $options
+     *
+     * @return \Omnipay\TelcellWallet\Message\CompletePurchaseRequest
+     */
+    public function completePurchase(array $options = array()): AbstractRequest
+    {
+        return $this->createRequest(CompletePurchaseRequest::class, $options);
     }
 }
