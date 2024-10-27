@@ -20,7 +20,6 @@ class PurchaseResponse extends AbstractResponse implements RedirectResponseInter
      * @var string
      */
     protected string $endpoint = 'https://telcellmoney.am/invoices';
-    protected string $testEndpoint = 'https://telcellmoney.am/proto_test2/invoices';
 
     /**
      * Set successful to false, as transaction is not completed yet
@@ -49,7 +48,7 @@ class PurchaseResponse extends AbstractResponse implements RedirectResponseInter
      */
     public function getRedirectUrl(): string
     {
-        return $this->data['testMode'] ? $this->testEndpoint : $this->endpoint;
+        return $this->endpoint;
     }
 
     /**

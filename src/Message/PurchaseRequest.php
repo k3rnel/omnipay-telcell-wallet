@@ -8,6 +8,7 @@ use Omnipay\Common\Message\AbstractRequest;
 
 use function base64_decode;
 use function base64_encode;
+use function json_encode;
 use function md5;
 
 /**
@@ -18,6 +19,8 @@ use function md5;
 class PurchaseRequest extends AbstractRequest
 {
     protected const ACTION_POST_INVOICE = 'PostInvoice';
+
+    protected const CURRENCY_SYMBOL = '֏';
 
     /**
      * Sets the request shop id.
@@ -83,28 +86,6 @@ class PurchaseRequest extends AbstractRequest
     public function getBuyer()
     {
         return $this->getParameter('buyer');
-    }
-
-    /**
-     * Sets the request issuer id.
-     *
-     * @param $value
-     *
-     * @return mixed
-     */
-    public function setTransactionId($value)
-    {
-        return $this->setParameter('issuer_id', $value);
-    }
-
-    /**
-     * Get Amount
-     *
-     * @return mixed
-     */
-    public function getTransactionId()
-    {
-        return $this->getParameter('issuer_id');
     }
 
     /**
@@ -174,26 +155,24 @@ class PurchaseRequest extends AbstractRequest
     public function getData(): array
     {
         $this->validate(
-            'issuer',
-            'currency',
-            'price',
-            'product',
-            'issuer_id',
+            'shopId',
+            'amount',
+            'description',
+            'transactionId',
             'valid_days',
-            'info'
+            'language',
         );
 
         return [
             'issuer'        => $this->getShopId(),
             'action'        => self::ACTION_POST_INVOICE,
-            'currency'      => $this->getCurrency(),
+            'currency'      => self::CURRENCY_SYMBOL,
             'price'         => $this->getAmount(),
-            'product'       => $this->getDescription(),
-            'issuer_id'     => $this->getTransactionId(),
+            'product'       => base64_encode($this->getDescription()),
+            'issuer_id'     => base64_encode($this->getTransactionId()),
             'valid_days'    => $this->getValidDays(),
-            'lang'          => $this->getLanguage(),
+            'lang'          => 'ru',
             'security_code' => $this->buildSecurityCode(),
-            'info'          => $this->getInfo(),
         ];
     }
 
@@ -203,12 +182,12 @@ class PurchaseRequest extends AbstractRequest
     protected function buildSecurityCode(): string
     {
         $product = base64_encode($this->getDescription());
-        $issuerId = base64_decode($this->getTransactionId());
+        $issuerId = base64_encode($this->getTransactionId());
 
         return md5(
             $this->getShopKey().
-            $this->getIssuer().
-            $this->getCurrency().
+            $this->getShopId().
+            self::CURRENCY_SYMBOL.
             $this->getAmount().
             $product.
             $issuerId.
